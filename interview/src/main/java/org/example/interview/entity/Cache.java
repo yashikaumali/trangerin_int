@@ -6,6 +6,8 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import jdk.jfr.Timestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.Instant;
 
@@ -23,6 +25,7 @@ public class Cache {
     @Column(name = "cache_value")
     private String value;
 
+    @UpdateTimestamp
     @Column(name = "last_accessed", nullable = false)
     private Instant lastAccessed;
 

@@ -5,7 +5,6 @@ import org.example.interview.repository.CacheRepository;
 import org.example.interview.response.CashResponse;
 import org.example.interview.service.CacheService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.crossstore.ChangeSetPersister;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -40,8 +39,7 @@ public class CacheServiceImpl implements CacheService {
 
     @Override
     public void delete(String key) {
-        List<Cache> caches = cacheRepository.findAllByOrderByLastAccessedAsc();
-        cacheRepository.deleteByKey(caches.get(0).getKey());
+        cacheRepository.deleteByKey(key);
     }
 
     @Override
@@ -50,13 +48,21 @@ public class CacheServiceImpl implements CacheService {
     }
 
     @Override
-    public Map<String, String> snapshot() {
-        return Map.of();
+    public List<CashResponse> getAll() {
+        List<Cache> caches  = cacheRepository.findAllByOrderByLastAccessedDesc();
+        return convertToResponseList(caches);
     }
 
     private CashResponse convertToResponse(Cache cache) {
         if (cache == null) return null;
         return new CashResponse(cache.getId(), cache.getKey(), cache.getValue(), cache.getLastAccessed());
+    }
+
+    private List<CashResponse> convertToResponseList(List<Cache> caches) {
+        if (caches == null) return null;
+        return caches.stream()
+                .map(cache -> new CashResponse(cache.getId(), cache.getKey(), cache.getValue(), cache.getLastAccessed()))
+                .toList();
     }
 
 

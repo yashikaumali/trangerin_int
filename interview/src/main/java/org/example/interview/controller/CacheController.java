@@ -46,14 +46,7 @@ public class CacheController {
     }
 
     @GetMapping("/all")
-    public ResponseEntity<Map<String, String>> all() {
-        Map<String, String> snap = cacheService.snapshot();
-        List<Map.Entry<String, String>> entries = new ArrayList<>(snap.entrySet());
-        Collections.reverse(entries);
-        Map<String, String> result = new LinkedHashMap<>();
-        for (Map.Entry<String, String> e : entries) {
-            result.put(e.getKey(), e.getValue());
-        }
-        return ResponseEntity.ok(result);
+    public ResponseEntity<List<CashResponse>> all() {
+        return ResponseEntity.ok(cacheService.getAll());
     }
 }
