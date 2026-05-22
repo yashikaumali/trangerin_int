@@ -10,6 +10,6 @@ public interface CacheRepository extends JpaRepository<Cache, Long> {
     Optional<Cache> findByKey(String key);
     void deleteByKey(String key);
 
-    List<Cache> findAllByOrderByLastAccessedAsc();
+    List<Cache> findAllByOrderByLastAccessedDesc();
 }
 

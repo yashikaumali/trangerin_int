@@ -6,6 +6,7 @@ import org.example.interview.response.CashResponse;
 import org.example.interview.service.CacheService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Map;
@@ -18,31 +19,42 @@ public class CacheServiceImpl implements CacheService {
     private CacheRepository cacheRepository;
 
     @Override
+    @Transactional
     public CashResponse get(String key) {
-        Optional<Cache> entry = cacheRepository.findByKey(key);;
-        Cache cache = entry.orElse(null);
-        return convertToResponse(cache);
-    }
-
-    @Override
-    public void put(String key, String value) {
-            Optional<Cache> entry = cacheRepository.findByKey(key);
-            Cache cache = entry.orElse(null);
-            if (cache == null) {
-                cache = new Cache();
-                cache.setKey(key);
-            }
-            cache.setValue(value);
-            cache.setKey(key);
+        Optional<Cache> entry = cacheRepository.findByKey(key);
+        if (entry.isPresent()) {
+            Cache cache = entry.get();
+            // Update lastAccessed time to current time
+            cache.setLastAccessed(java.time.Instant.now());
             cacheRepository.save(cache);
+            return convertToResponse(cache);
+        }
+        return null;
     }
 
     @Override
+    @Transactional
+    public void put(String key, String value) {
+        Optional<Cache> entry = cacheRepository.findByKey(key);
+        Cache cache = entry.orElse(null);
+        if (cache == null) {
+            cache = new Cache();
+            cache.setKey(key);
+        }
+        cache.setValue(value);
+        cache.setKey(key);
+        cache.setLastAccessed(java.time.Instant.now());
+        cacheRepository.save(cache);
+    }
+
+    @Override
+    @Transactional
     public void delete(String key) {
         cacheRepository.deleteByKey(key);
     }
 
     @Override
+    @Transactional
     public void clear() {
         cacheRepository.deleteAll();
     }
